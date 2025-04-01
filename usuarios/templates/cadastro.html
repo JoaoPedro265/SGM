@@ -15,10 +15,12 @@
             >Faça login</a
           >
         </p>
+
       </div>
       <div class="mt-8">
         <div>
-          <form action="" method="" class="space-y-6">
+          <form action="{% url "cadastro" %}" method="POST" class="space-y-6">
+            {% csrf_token %}
             <div>
               <label
                 for="email"

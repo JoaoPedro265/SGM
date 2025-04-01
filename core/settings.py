@@ -130,3 +130,13 @@ MEDIA_URL = "/media/"  # url desse arquivo vai estar /media
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Messages
+
+from django.contrib.messages import constants
+
+MESSAGE_TAGS = {
+    constants.SUCCESS: "bg-green-50 text-green-700",
+    constants.ERROR: "bg-red-50 text-red-700",
+}
