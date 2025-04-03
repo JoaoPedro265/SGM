@@ -12,10 +12,17 @@ def mentorados(request):
         return redirect("login")
     if request.method == "GET":
         navigators = Navigators.objects.filter(user=request.user)
+        mentorados = Mentorados.objects.filter(user=request.user)
+        for item in mentorados:
+            print(item.estagio)
         return render(
             request,
             "mentorados.html",
-            {"estagios": Mentorados.estado_choices, "navigators": navigators},
+            {
+                "estagios": Mentorados.estado_choices,
+                "navigators": navigators,
+                "mentorados": mentorados,
+            },
         )
     elif request.method == "POST":
         nome = request.POST.get("nome")
