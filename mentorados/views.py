@@ -13,8 +13,14 @@ def mentorados(request):
     if request.method == "GET":
         navigators = Navigators.objects.filter(user=request.user)
         mentorados = Mentorados.objects.filter(user=request.user)
-        for item in mentorados:
-            print(item.estagio)
+
+        estagios_flat = []
+        qtd_estagios = []
+        for item in Mentorados.estado_choices:
+            estagios_flat.append(item[1])
+        for i, j in Mentorados.estado_choices:
+            x = Mentorados.objects.filter(estagio=i, user=request.user).count()
+            qtd_estagios.append(x)
         return render(
             request,
             "mentorados.html",
@@ -22,6 +28,8 @@ def mentorados(request):
                 "estagios": Mentorados.estado_choices,
                 "navigators": navigators,
                 "mentorados": mentorados,
+                "estagios_flat": estagios_flat,
+                "qtd_estagios": qtd_estagios,
             },
         )
     elif request.method == "POST":
@@ -44,3 +52,10 @@ def mentorados(request):
             request, constants.SUCCESS, "Mentorado cadastrado com sucesso."
         )
         return redirect("mentorados")
+
+
+def reunioes(request):
+    if request.method == "GET":
+        return render(request, "reunioes.html")
+    elif request.method == "POST":
+        pass
