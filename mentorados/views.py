@@ -86,3 +86,18 @@ def reunioes(request):
             request, constants.SUCCESS, "Horário disponibilizado com sucesso."
         )
         return redirect("reunioes")
+
+
+def auth(request):
+    if request.method == "GET":
+        print(request.COOKIES)
+        return render(request, "auth_mentorado.html")
+    elif request.method == "POST":
+        token = request.POST.get("token")
+        if not Mentorados.objects.filter(token=token).exists():
+            messages.add_message(request, constants.ERROR, "Token invalido")
+            return redirect("auth_mentorado")
+        response = redirect("escolher _dia")
+        response.set_cookie("auth_mentorado", token, max_age=3600)
+
+        return response
