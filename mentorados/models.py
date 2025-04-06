@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import timedelta
+import secrets
 
 
 # Create your models here.
@@ -19,6 +21,27 @@ class Mentorados(models.Model):
     navigator = models.ForeignKey(Navigators, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # mentor
     criado_em = models.DateField(auto_now_add=True)
+    token = models.CharField(max_length=16)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = self.gerar_token_unico()
+        super().save(*args, **kwargs)
+
+    def gerar_token_unico(self):
+        while True:
+            token = secrets.token_urlsafe(8)
+            if not Mentorados.objects.filter(token=token).exists():
+                return token
 
     def __str__(self):
         return f"{self.nome}"
+
+
+class DisponibilidadedeHorarios(models.Model):
+    data_inicial = models.DateTimeField(null=True, blank=True)
+    mentor = models.ForeignKey(User, on_delete=models.CASCADE)
+    agendado = models.BooleanField(default=False)
+
+    def data_final(self):
+        return self.data_inicial + timedelta(minutes=50)

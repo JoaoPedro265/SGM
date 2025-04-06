@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Mentorados, Navigators
+from .models import Mentorados, Navigators, DisponibilidadedeHorarios
 from django.contrib import messages
 from django.contrib.messages import constants
+from datetime import datetime, timedelta
 
 # Create your views here.
 
@@ -58,4 +59,30 @@ def reunioes(request):
     if request.method == "GET":
         return render(request, "reunioes.html")
     elif request.method == "POST":
-        pass
+        data = request.POST.get("data")  # é uma str
+        data = datetime.strptime(data, "%Y-%m-%dT%H:%M")  # converter str para data
+
+        disponibilidades = DisponibilidadedeHorarios.objects.filter(
+            mentor=request.user,
+            data_inicial__gte=(
+                data - timedelta(minutes=50)
+            ),  # já existe algum horario que seja MAIOR ou igual a data do agendamento - 50?
+            data_inicial__lte=(
+                data + timedelta(minutes=50)
+            ),  # já existe algum horario que seja MENOR ou igual a data do agendamento + 50?
+        )
+
+        if disponibilidades.exists():
+            messages.add_message(
+                request, constants.ERROR, "Você já possui uma reunião em aberto."
+            )
+            return redirect("reunioes")
+        disponibilidades = DisponibilidadedeHorarios(
+            data_inicial=data, mentor=request.user
+        )
+
+        disponibilidades.save()
+        messages.add_message(
+            request, constants.SUCCESS, "Horário disponibilizado com sucesso."
+        )
+        return redirect("reunioes")
