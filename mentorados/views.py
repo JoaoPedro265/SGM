@@ -4,6 +4,7 @@ from .models import Mentorados, Navigators, DisponibilidadedeHorarios
 from django.contrib import messages
 from django.contrib.messages import constants
 from datetime import datetime, timedelta
+from .auth import valida_token
 
 # Create your views here.
 
@@ -97,7 +98,14 @@ def auth(request):
         if not Mentorados.objects.filter(token=token).exists():
             messages.add_message(request, constants.ERROR, "Token invalido")
             return redirect("auth_mentorado")
-        response = redirect("escolher _dia")
-        response.set_cookie("auth_mentorado", token, max_age=3600)
+        response = redirect("mentorados")
+        response.set_cookie("auth_token", token, max_age=3600)
 
         return response
+
+
+def escolher_dia(request):
+    if not valida_token(request.COOKIES.get("auth_token")):
+        return redirect("auth_mentorado")
+    if request.method == "GET":
+        return render(request, "escolher_dia.html")
