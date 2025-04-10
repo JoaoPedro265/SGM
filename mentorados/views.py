@@ -4,6 +4,7 @@ from .models import Mentorados, Navigators, DisponibilidadedeHorarios
 from django.contrib import messages
 from django.contrib.messages import constants
 from datetime import datetime, timedelta
+import locale
 from .auth import valida_token
 
 # Create your views here.
@@ -91,7 +92,6 @@ def reunioes(request):
 
 def auth(request):
     if request.method == "GET":
-        print(request.COOKIES)
         return render(request, "auth_mentorado.html")
     elif request.method == "POST":
         token = request.POST.get("token")
@@ -104,8 +104,62 @@ def auth(request):
         return response
 
 
+# Tabelas com nomes em português
+nomes_dias = {
+    0: "Segunda-feira",
+    1: "Terça-feira",
+    2: "Quarta-feira",
+    3: "Quinta-feira",
+    4: "Sexta-feira",
+    5: "Sábado",
+    6: "Domingo",
+}
+
+nomes_meses = {
+    1: "Janeiro",
+    2: "Fevereiro",
+    3: "Março",
+    4: "Abril",
+    5: "Maio",
+    6: "Junho",
+    7: "Julho",
+    8: "Agosto",
+    9: "Setembro",
+    10: "Outubro",
+    11: "Novembro",
+    12: "Dezembro",
+}
+
+
 def escolher_dia(request):
+    # Verifica se o usuário está logado
+    if not valida_token(request.COOKIES.get("auth_token")):
+        return redirect("auth_mentorado")
+
+    if request.method == "GET":
+        # Pega o mentorado com base no token
+        mentorado = valida_token(request.COOKIES.get("auth_token"))
+        # Pega as datas disponíveis a partir de hoje
+        disponibilidades = DisponibilidadedeHorarios.objects.filter(
+            data_inicial__gte=datetime.now(), agendado=False, mentor=mentorado.user
+        ).values_list("data_inicial", flat=True)
+
+        # Criar lista com informações organizadas
+        datas = []
+        datas_unicas = set([d.date() for d in disponibilidades])
+        for data in datas_unicas:
+            datas.append(
+                {
+                    "data_completa": data.strftime("%d-%m-%Y"),
+                    "mes": nomes_meses[data.month],
+                    "dia_semana": nomes_dias[data.weekday()],
+                }
+            )
+        return render(request, "escolher_dia.html", {"horarios": datas})
+
+
+def agendar_reuniao(request):
     if not valida_token(request.COOKIES.get("auth_token")):
         return redirect("auth_mentorado")
     if request.method == "GET":
-        return render(request, "escolher_dia.html")
+        return render(request, "agendar_reuniao.html")
