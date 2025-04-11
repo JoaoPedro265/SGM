@@ -172,4 +172,8 @@ def agendar_reuniao(request):
             mentor=mentorado.user,
         )
 
-        return render(request, "agendar_reuniao.html", {"horarios": horarios})
+        return render(
+            request,
+            "agendar_reuniao.html",
+            {"horarios": horarios, "tags": Reuniao.tag_choices},
+        )
