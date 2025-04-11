@@ -16,7 +16,8 @@
       >
         {% for horario in horarios %}
         <option value="{{horario.id}}" class="text-slate-900">
-          {{horario.data_inicial.time}} às {{horario.data_final.time}}
+          {{horario.data_inicial|date:"H:i"}} às
+          {{horario.data_final|date:"H:i"}}
         </option>
         {% endfor %}
       </select>
