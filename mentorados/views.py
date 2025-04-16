@@ -59,7 +59,8 @@ def mentorados(request):
 
 def reunioes(request):
     if request.method == "GET":
-        return render(request, "reunioes.html")
+        reunioes = Reuniao.objects.filter(data__mentor=request.user)
+        return render(request, "reunioes.html", {"reunioes": reunioes})
     elif request.method == "POST":
         data = request.POST.get("data")  # é uma str
         data = datetime.strptime(data, "%Y-%m-%dT%H:%M")  # converter str para data
