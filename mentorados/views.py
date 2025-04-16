@@ -161,19 +161,51 @@ def escolher_dia(request):
 def agendar_reuniao(request):
     if not valida_token(request.COOKIES.get("auth_token")):
         return redirect("auth_mentorado")
+
+    mentorado = valida_token(request.COOKIES.get("auth_token"))
+
     if request.method == "GET":
         data = request.GET.get("data")
         data = datetime.strptime(data, "%d-%m-%Y")  # converter str para formato data
-        mentorado = valida_token(request.COOKIES.get("auth_token"))
+
         horarios = DisponibilidadedeHorarios.objects.filter(
             data_inicial__gte=data,
             data_inicial__lt=data + timedelta(days=1),
             agendado=False,
             mentor=mentorado.user,
         )
-
         return render(
             request,
             "agendar_reuniao.html",
             {"horarios": horarios, "tags": Reuniao.tag_choices},
         )
+    else:
+        horario_id = request.POST.get("horario")
+        tag = request.POST.get("tag")
+        descricao = request.POST.get("descricao")
+        try:
+            # Pega o objeto do horário pelo ID
+            horario = DisponibilidadedeHorarios.objects.get(id=horario_id)
+        except DisponibilidadedeHorarios.DoesNotExist:
+            # Se o horário não existir
+            messages.add_message(request, constants.ERROR, "Horário inválido.")
+            return redirect("escolher_dia")
+        if horario.mentor != mentorado.user:
+            messages.add_message(
+                request, constants.ERROR, "Você não pode agendar esse horário."
+            )
+            return redirect("escolher_dia")
+        horario.agendado = True
+        horario.save()
+        reuniao = Reuniao(
+            data=horario,
+            mentorado=mentorado,
+            tag=tag,
+            descricao=descricao,
+        )
+        reuniao.save()
+
+        messages.add_message(
+            request, constants.SUCCESS, "Reunião agendada com sucesso!"
+        )
+        return redirect("escolher_dia")
