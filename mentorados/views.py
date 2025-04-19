@@ -246,3 +246,17 @@ def upload(request, id):
     upload = Upload(mentorado=mentorado, video=video)
     upload.save()
     return redirect(f"/mentorados/tarefa/{mentorado.id}")
+
+
+def tarefa_mentorado(request):
+    mentorado = valida_token(request.COOKIES.get("auth_token"))
+    if not mentorado:
+        return redirect("auth_mentorado")
+    if request.method == "GET":
+        videos = Upload.objects.filter(mentorado=mentorado)
+        tarefas = Tarefa.objects.filter(mentorado=mentorado)
+        return render(
+            request,
+            "tarefa_mentorado.html",
+            {"mentorado": mentorado, "videos": videos, "tarefas": tarefas},
+        )
