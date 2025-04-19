@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import Mentorados, Navigators, DisponibilidadedeHorarios, Reuniao
+from django.http import HttpResponse, Http404
+from .models import Mentorados, Navigators, DisponibilidadedeHorarios, Reuniao, Tarefa
 from django.contrib import messages
 from django.contrib.messages import constants
 from datetime import datetime, timedelta
@@ -210,3 +210,21 @@ def agendar_reuniao(request):
             request, constants.SUCCESS, "Reunião agendada com sucesso!"
         )
         return redirect("escolher_dia")
+
+
+def tarefa(request, id):
+    mentorado = Mentorados.objects.get(id=id)
+    if mentorado.user != request.user:
+        raise Http404()
+    if request.method == "GET":
+        tarefas = Tarefa.objects.filter(mentorado=mentorado)
+        return render(
+            request,
+            "tarefa.html",
+            {"mentorado": mentorado, "tarefas": tarefas},
+        )
+    else:
+        tarefa = request.POST.get("tarefa")
+        tarefa = Tarefa(mentorado=mentorado, tarefa=tarefa)
+        tarefa.save()
+        return redirect(f"/mentorados/tarefa/{id}")
