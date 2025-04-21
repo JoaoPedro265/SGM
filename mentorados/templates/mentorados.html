@@ -6,10 +6,9 @@
     aria-label="Global"
   >
     <div class="flex lg:flex-1">
-      Aula 1 2
       <a href="#" class="-m-1.5 p-1.5">
         <span class="sr-only">Your Company</span>
-        <img class="h-8 w-auto" src="<% static 'logo.png' %>" alt="" />
+        <img class="h-8 w-auto" src="{% static 'logo.png' %}" alt="">
       </a>
     </div>
 
@@ -38,10 +37,8 @@
     </div>
 
     <div class="hidden lg:flex lg:gap-x-12">
-      <a href="#" class="text-sm/6 font-semibold text-gray-100">Mentorados</a>
-      <a href="#" class="text-sm/6 font-semibold text-gray-100">Tarefas</a>
-      <a href="#" class="text-sm/6 font-semibold text-gray-100">Progressos</a>
-      <a href="#" class="text-sm/6 font-semibold text-gray-100">Navigators</a>
+      <a href="{% url "mentorados" %}" class="text-sm/6 font-semibold text-gray-100">Mentorados</a>
+      <a href="{% url "reunioes" %}" class="text-sm/6 font-semibold text-gray-100">Reunioes</a>
     </div>
 
     <div class="hidden lg:flex lg:flex-1 lg:justify-end"></div>
