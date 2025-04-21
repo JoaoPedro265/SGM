@@ -13,6 +13,7 @@ from django.contrib.messages import constants
 from datetime import datetime, timedelta
 import locale
 from .auth import valida_token
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
@@ -260,3 +261,16 @@ def tarefa_mentorado(request):
             "tarefa_mentorado.html",
             {"mentorado": mentorado, "videos": videos, "tarefas": tarefas},
         )
+
+
+@csrf_exempt
+def tarefa_alterar(request, id):
+    mentorado = valida_token(request.COOKIES.get("auth_token"))
+    if not mentorado:
+        return redirect("auth_mentorado")
+    tarefa = Tarefa.objects.get(id=id)
+    if mentorado != tarefa.mentorado:
+        raise Http404()
+    tarefa.realizada = not tarefa.realizada
+    # tarefa.save()
+    return HttpResponse("teste")

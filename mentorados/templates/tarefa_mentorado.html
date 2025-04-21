@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% load static %} {% block 'body' %}
-
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
 <header class="bg-slate-900">
   <nav
     class="flex items-center justify-between p-4 lg:px-8"
@@ -147,6 +147,8 @@
           {% for tarefa in tarefas %}
           <div class="flex items-center mb-4">
             <input
+              hx-post="/mentorados/tarefa_alterar/{{tarefa.id}}"
+              hx-trigger="click"
               id="default-checkbox"
               type="checkbox"
               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
