@@ -146,7 +146,9 @@
 
           {% for tarefa in tarefas %}
           <div class="flex items-center mb-4">
+            <!-- prettier-ignore -->
             <input
+              {% if tarefa.realizada %}checked{% endif %}
               hx-post="/mentorados/tarefa_alterar/{{tarefa.id}}"
               hx-trigger="click"
               id="default-checkbox"

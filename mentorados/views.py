@@ -269,8 +269,9 @@ def tarefa_alterar(request, id):
     if not mentorado:
         return redirect("auth_mentorado")
     tarefa = Tarefa.objects.get(id=id)
-    if mentorado != tarefa.mentorado:
+    print(tarefa)
+    if mentorado != tarefa.mentorado:  # se for true fica false se for false fica true
         raise Http404()
     tarefa.realizada = not tarefa.realizada
-    # tarefa.save()
+    tarefa.save()
     return HttpResponse("teste")
